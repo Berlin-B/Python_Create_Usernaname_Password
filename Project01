@@ -1,0 +1,110 @@
+import re
+
+def welcome():
+	print("Welcome to your dashboard")
+
+def register():
+    Username = input("Create username:")
+    condition = "([A-Za-z]+[.-_])*[A-Za-z0]+[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+"
+    db = open('database.txt', 'r')
+    d = []
+    f = []
+    for i in db:
+        a,b = i.split(",")
+        b = b.strip()
+        d.append(a)
+        f.append(b)
+    if not re.fullmatch(condition,Username):
+           print("invalid username")
+           register()
+    else:
+        print("valid username")
+    
+    Password = input("Create password:")
+    Password1 = input("Confirm password:")
+    if Password != Password1:
+        print("Passwords don't match, restart")
+        register()
+    else:
+        if Username in d:
+            print("Username exits")
+            register()
+        elif len(Password)<=6:
+            print("Password too short, restart:")
+            register()
+        elif len(Password)>=15:
+            print("Password too long, restart:")
+            register()
+        elif Password.islower() == True:
+             print("Password has no uppercase")
+             register()
+        elif Password.isupper() == True:
+            print("Password has no lowercase")
+            register()
+        else:
+            if Password == Password1:
+             db = open("database.txt", "a")
+             db.write(Username+", "+Password+"\n")
+             print("Registered")
+             print("Please login to proceed:")
+             gainAccess()
+            
+def gainAccess():
+    Username = input("Enter your username:")
+    Password = input("Enter your Password:")
+    
+    if not len(Username or Password) < 1:
+       db = open("database.txt","r")
+       d = []
+       f = []
+       for i in db:
+           a,b = i.split(",")
+           b = b.strip()
+           d.append(a)
+           f.append(b)
+       data = dict(zip(d, f))
+       if Username in data:
+          if Password == data[Username]:
+            print("Login success!")
+            print("Hi", Username)
+            welcome()
+          else:
+              print("Forgot password? PLease select an option: ")
+              forgotpwd()
+       else:
+            print("Username doesnot exist")
+
+def forgotpwd():
+	option = input("View | Add:")
+	if option == "View":
+		view()
+	elif option == "Add":
+		add()
+	else:
+		print("Please enter a valid parameter, this is case-sensitive")
+  
+def view():
+    with open('database.txt', 'r') as f:
+        for line in f.readlines():
+            data = line.rstrip()
+            user, passw = data.split(",")
+            print("Username:", user, ", Password:", passw)    
+            
+def add():
+    Username = input('Account Name: ')
+    Password = input("Password: ")
+
+    with open('database.txt', 'a') as f:
+        f.write(Username + "," + Password + "\n")  
+
+def home(option=None):
+	print("Welcome, please select an option: ")
+	option = input("Login | Signup:")
+	if option == "Login":
+		gainAccess()
+	elif option == "Signup":
+		register()
+	else:
+		print("Please enter a valid parameter, this is case-sensitive")
+
+home()  
